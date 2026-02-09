@@ -1,19 +1,20 @@
 from fastapi import FastAPI
-from routers.user_routes import router as user_router
-from db import get_db, DATABASE_URL
+from routes.user_routes import router as user_router
+from db import get_db, DATABASE_URL,engine
 from sqlalchemy import create_engine
 import os
 from models import Base
 app = FastAPI()
 
 app.include_router(user_router)
-if not os.path.exists("test.db"):
-    engine = create_engine(DATABASE_URL)
-    Base.metadata.create_all(engine)
+
+# Create database tables if they don't exist
+Base.metadata.create_all(bind=engine)
 
 @app.get("/")
 def read_root():
-    return {"Hello": "world"}
+    return {"Hello": "World"}
+
 
 if __name__ == "__main__":
     import uvicorn
