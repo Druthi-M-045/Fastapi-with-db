@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 from utils.ai_response import get_completion
 from schemas.ai_response_schemas import AIRequest, AIResponse
 from schemas.History_schemas import HistoryResponse
 from models import History, User
 from db import get_db
-from dependencies import get_current_user
+from dependencies import get_current_user, get_current_user_optional
 from repositories.history_repo import HistoryRepo
 
 router = APIRouter()
@@ -17,20 +17,21 @@ router = APIRouter()
 def ask_ai(
     request: AIRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Get response from AI model and save to history."""
+    """Get response from AI model and save to history if user is logged in."""
     try:
         response_text = get_completion(request.message, request.system_prompt)
         
-        # Save to history using Repo logic
-        history_repo = HistoryRepo(db)
-        history_entry = History(
-            user_id=current_user.id,
-            input_text=request.message,
-            output_text=response_text
-        )
-        history_repo.add_history(history_entry)
+        # Only save to history if user is authenticated
+        if current_user:
+            history_repo = HistoryRepo(db)
+            history_entry = History(
+                user_id=current_user.id,
+                input_text=request.message,
+                output_text=response_text
+            )
+            history_repo.add_history(history_entry)
         
         return AIResponse(response=response_text)
     except Exception as e:
