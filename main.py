@@ -4,7 +4,7 @@ from routes.ai_response_routes import router as ai_response_router
 from routes.email_routes import router as email_router
 from db import get_db,DATABASE_URL
 from sqlalchemy import create_engine
-import os
+import os 
 from models import Base
 from fastapi.middleware.cors import CORSMiddleware
 
