@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from db import get_db
 from models import User
 from repositories.user_repo import UserRepo
-from schemas.User_schemas import UserSchema, UserResponse
+from schemas.User_schemas import Userschemas, UserResponse
 from schemas.Token_schemas import Token, TokenRefresh, LoginRequest
 from utils.jwt_handler import create_tokens, verify_token
 from dependencies import get_current_user
@@ -18,7 +18,7 @@ def get_me(current_user: User = Depends(get_current_user)):
 
 
 @router.post("/signup")
-def signup(user: UserSchema, db: Session = Depends(get_db)):
+def signup(user: Userschemas, db: Session = Depends(get_db)):
     user_repo = UserRepo(db)
     # Convert Pydantic schema to SQLAlchemy model
     existing_user = user_repo.get_user_by_email(user.email)
