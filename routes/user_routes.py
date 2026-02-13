@@ -3,15 +3,11 @@ from sqlalchemy.orm import Session
 from db import get_db
 from models import User
 from repositories.user_repo import UserRepo
-from schemas.User_schemas import Userschemas
+from schemas.user_schemas import Userschemas
 from schemas.Token_schemas import Token, TokenRefresh, LoginRequest
 from utils.jwt_handler import create_tokens, verify_token
 
-
 router = APIRouter()
-
-
-
 
 @router.post("/signup")
 def signup(user: Userschemas, db: Session = Depends(get_db)):
@@ -39,7 +35,6 @@ def login(credentials: LoginRequest, db: Session = Depends(get_db)):
         )
     
     return create_tokens(user.id, user.email)
-
 
 @router.post("/refresh", response_model=Token)
 def refresh_token(token_data: TokenRefresh, db: Session = Depends(get_db)):
